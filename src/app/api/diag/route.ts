@@ -1,6 +1,7 @@
 // Temporary diagnostic endpoint — remove after debugging prod connection mismatch.
 import { NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
+import { getLatest } from '@/lib/db';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,8 +31,7 @@ export async function GET() {
         FROM prices
        ORDER BY effective_date DESC
        LIMIT 1`) as unknown[];
-    // Call the shared helper (now lazy) to confirm the fix
-    const { getLatest } = await import('@/lib/db');
+    // Call the shared helper via a static import (not dynamic)
     const viaShared = await getLatest();
     return NextResponse.json({
       host,
