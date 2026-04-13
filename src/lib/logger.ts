@@ -1,0 +1,8 @@
+// Stdout-only pino logger. Vercel captures stdout into its log drain;
+// no file sink, no LOG_DIR.
+import pino from 'pino';
+
+export const logger = pino({
+  level: process.env.LOG_LEVEL ?? 'info',
+  base: { app: 'zakolikdnes' },
+});
