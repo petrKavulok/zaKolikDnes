@@ -21,11 +21,24 @@ export async function GET() {
   try {
     const sql = neon(url);
     const count = (await sql`SELECT COUNT(*)::int AS n FROM prices`) as { n: number }[];
-    const latest = (await sql`
-      SELECT bulletin_id, effective_date::text, imported_at::text
-        FROM prices ORDER BY effective_date DESC LIMIT 1
-    `) as unknown[];
-    return NextResponse.json({ host, rowCount: count[0]?.n, latest: latest[0] ?? null });
+    // Replicate the EXACT query from getLatest() in src/lib/db.ts
+    const latestExact = (await sql`
+      SELECT bulletin_id,
+             to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
+             gasoline_czk, diesel_czk, source_url,
+             imported_at::text AS imported_at
+        FROM prices
+       ORDER BY effective_date DESC
+       LIMIT 1`) as unknown[];
+    // Also call the shared module-level client used by getLatest
+    const { getLatest } = await import('@/lib/db');
+    const viaShared = await getLatest();
+    return NextResponse.json({
+      host,
+      rowCount: count[0]?.n,
+      latestExact: latestExact[0] ?? null,
+      viaShared: viaShared ?? null,
+    });
   } catch (err) {
     return NextResponse.json(
       { host, error: (err as Error).message },
