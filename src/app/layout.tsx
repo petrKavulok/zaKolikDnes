@@ -3,7 +3,7 @@ import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'zaKolikDnes — maximální ceny pohonných hmot',
+  title: 'Za kolik dnes?',
   description: 'Aktuální maximální ceny benzínu Natural 95 a nafty z Cenového věstníku MF ČR.',
   manifest: '/manifest.json',
   icons: {

@@ -25,10 +25,10 @@ export default async function Page() {
       <header className="mb-8 flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <img
-            src="/favicon-96x96.png"
+            src="/pump.png"
             alt="zaKolikDnes logo"
-            width={48}
-            height={48}
+            width={100}
+            height={100}
             className="mt-1 h-12 w-12 rounded"
           />
           <div>
