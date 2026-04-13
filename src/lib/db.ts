@@ -28,7 +28,9 @@ export interface PriceRow {
 // One-time schema bootstrap. Call from `npm run db:migrate` — NOT on every
 // cold start.
 export async function ensureSchema(): Promise<void> {
-  const sql = neon(process.env.DATABASE_URL!);
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+  const sql = neon(url);
   await sql`
     CREATE TABLE IF NOT EXISTS prices (
       bulletin_id    TEXT PRIMARY KEY,
@@ -49,7 +51,9 @@ export async function upsertPrice(row: {
   diesel_czk: number;
   source_url?: string | null;
 }): Promise<{ inserted: boolean }> {
-  const sql = neon(process.env.DATABASE_URL!);
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+  const sql = neon(url);
   // RETURNING + ON CONFLICT DO NOTHING: rows is non-empty iff a row was inserted.
   const rows = (await sql`
     INSERT INTO prices (bulletin_id, effective_date, gasoline_czk, diesel_czk, source_url)
@@ -61,7 +65,9 @@ export async function upsertPrice(row: {
 }
 
 export async function getLatest(): Promise<PriceRow | undefined> {
-  const sql = neon(process.env.DATABASE_URL!);
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+  const sql = neon(url);
   const rows = (await sql`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
@@ -74,7 +80,9 @@ export async function getLatest(): Promise<PriceRow | undefined> {
 }
 
 export async function getHistory(limit = 30): Promise<PriceRow[]> {
-  const sql = neon(process.env.DATABASE_URL!);
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+  const sql = neon(url);
   const rows = (await sql`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
@@ -88,7 +96,9 @@ export async function getHistory(limit = 30): Promise<PriceRow[]> {
 
 /** Set of bulletin identifiers already in the database. */
 export async function getKnownBulletinIds(): Promise<Set<string>> {
-  const sql = neon(process.env.DATABASE_URL!);
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+  const sql = neon(url);
   const rows = (await sql`
     SELECT bulletin_id FROM prices WHERE bulletin_id IS NOT NULL`) as {
     bulletin_id: string;
