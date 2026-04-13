@@ -8,21 +8,13 @@
 //     bulletins it has already processed without fetching the PDF.
 //   * `effective_date` stays unique too (one bulletin = one effective date).
 //
-// Client-construction pattern: each function creates its own `sql` as a
-// local `const`. Observed in prod:
-//   * Module-level `const sql = neon(process.env.DATABASE_URL!)` silently
-//     returned 0 rows.
-//   * A helper like `await getSql()\`SELECT ...\`` also returned 0 rows.
-// Only `const sql = neon(url); await sql\`...\`` works. Likely an SWC/
-// Turbopack quirk around tagging a template on the return of a call
-// expression. The neon driver is stateless HTTP, so per-call cost is nil.
+// Client-construction pattern: `neon(process.env.DATABASE_URL!)` must be
+// called *directly* inside each function — neither module-level nor
+// helper-wrapped variants survive the production bundle (both silently
+// return 0 rows, confirmed via an /api/diag endpoint). Likely an SWC/
+// Turbopack quirk around tagged templates on call expressions. The neon
+// driver is stateless HTTP, so per-call cost is nil.
 import { neon } from '@neondatabase/serverless';
-
-function getSql() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL is not set');
-  return neon(url);
-}
 
 export interface PriceRow {
   bulletin_id: string;
@@ -36,7 +28,7 @@ export interface PriceRow {
 // One-time schema bootstrap. Call from `npm run db:migrate` — NOT on every
 // cold start.
 export async function ensureSchema(): Promise<void> {
-  const sql = getSql();
+  const sql = neon(process.env.DATABASE_URL!);
   await sql`
     CREATE TABLE IF NOT EXISTS prices (
       bulletin_id    TEXT PRIMARY KEY,
@@ -57,7 +49,7 @@ export async function upsertPrice(row: {
   diesel_czk: number;
   source_url?: string | null;
 }): Promise<{ inserted: boolean }> {
-  const sql = getSql();
+  const sql = neon(process.env.DATABASE_URL!);
   // RETURNING + ON CONFLICT DO NOTHING: rows is non-empty iff a row was inserted.
   const rows = (await sql`
     INSERT INTO prices (bulletin_id, effective_date, gasoline_czk, diesel_czk, source_url)
@@ -69,7 +61,7 @@ export async function upsertPrice(row: {
 }
 
 export async function getLatest(): Promise<PriceRow | undefined> {
-  const sql = getSql();
+  const sql = neon(process.env.DATABASE_URL!);
   const rows = (await sql`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
@@ -82,7 +74,7 @@ export async function getLatest(): Promise<PriceRow | undefined> {
 }
 
 export async function getHistory(limit = 30): Promise<PriceRow[]> {
-  const sql = getSql();
+  const sql = neon(process.env.DATABASE_URL!);
   const rows = (await sql`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
@@ -96,7 +88,7 @@ export async function getHistory(limit = 30): Promise<PriceRow[]> {
 
 /** Set of bulletin identifiers already in the database. */
 export async function getKnownBulletinIds(): Promise<Set<string>> {
-  const sql = getSql();
+  const sql = neon(process.env.DATABASE_URL!);
   const rows = (await sql`
     SELECT bulletin_id FROM prices WHERE bulletin_id IS NOT NULL`) as {
     bulletin_id: string;
