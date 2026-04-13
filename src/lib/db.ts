@@ -11,6 +11,20 @@ import { neon } from '@neondatabase/serverless';
 
 const sql = neon(process.env.DATABASE_URL!);
 
+// TEMPORARY DEBUG — captures env state at module evaluation time so /api/diag
+// can compare against handler-time env. Remove once prod mismatch is fixed.
+export const __debug = {
+  urlDefinedAtModuleLoad: typeof process.env.DATABASE_URL === 'string',
+  urlLengthAtModuleLoad: process.env.DATABASE_URL?.length ?? 0,
+  hostAtModuleLoad: (() => {
+    try {
+      return process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).host : null;
+    } catch {
+      return null;
+    }
+  })(),
+};
+
 export interface PriceRow {
   bulletin_id: string;
   effective_date: string; // ISO YYYY-MM-DD

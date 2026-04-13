@@ -31,13 +31,19 @@ export async function GET() {
        ORDER BY effective_date DESC
        LIMIT 1`) as unknown[];
     // Also call the shared module-level client used by getLatest
-    const { getLatest } = await import('@/lib/db');
+    const { getLatest, __debug } = await import('@/lib/db');
     const viaShared = await getLatest();
     return NextResponse.json({
       host,
       rowCount: count[0]?.n,
       latestExact: latestExact[0] ?? null,
       viaShared: viaShared ?? null,
+      envAtHandler: {
+        defined: typeof process.env.DATABASE_URL === 'string',
+        length: process.env.DATABASE_URL?.length ?? 0,
+        host,
+      },
+      __debug: __debug ?? null,
     });
   } catch (err) {
     return NextResponse.json(
