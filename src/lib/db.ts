@@ -9,21 +9,17 @@
 //   * `effective_date` stays unique too (one bulletin = one effective date).
 import { neon } from '@neondatabase/serverless';
 
-const sql = neon(process.env.DATABASE_URL!);
-
-// TEMPORARY DEBUG — captures env state at module evaluation time so /api/diag
-// can compare against handler-time env. Remove once prod mismatch is fixed.
-export const __debug = {
-  urlDefinedAtModuleLoad: typeof process.env.DATABASE_URL === 'string',
-  urlLengthAtModuleLoad: process.env.DATABASE_URL?.length ?? 0,
-  hostAtModuleLoad: (() => {
-    try {
-      return process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).host : null;
-    } catch {
-      return null;
-    }
-  })(),
-};
+// Lazy client — instantiating `neon()` at module-load time was producing a
+// client that returned no rows in prod (observed via /api/diag: identical
+// `neon(process.env.DATABASE_URL)` calls returned different results depending
+// on when they ran). Reading env + constructing the client per-call avoids
+// any bundling/evaluation-order quirks and costs nothing (the driver is
+// stateless HTTP).
+function sqlClient() {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+  return neon(url);
+}
 
 export interface PriceRow {
   bulletin_id: string;
@@ -37,7 +33,7 @@ export interface PriceRow {
 // One-time schema bootstrap. Call from `npm run db:migrate` — NOT on every
 // cold start.
 export async function ensureSchema(): Promise<void> {
-  await sql`
+  await sqlClient()`
     CREATE TABLE IF NOT EXISTS prices (
       bulletin_id    TEXT PRIMARY KEY,
       effective_date DATE NOT NULL UNIQUE,
@@ -46,8 +42,8 @@ export async function ensureSchema(): Promise<void> {
       source_url     TEXT,
       imported_at    TIMESTAMPTZ NOT NULL DEFAULT now()
     )`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_prices_effective_date ON prices(effective_date)`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_prices_imported_at ON prices(imported_at)`;
+  await sqlClient()`CREATE INDEX IF NOT EXISTS idx_prices_effective_date ON prices(effective_date)`;
+  await sqlClient()`CREATE INDEX IF NOT EXISTS idx_prices_imported_at ON prices(imported_at)`;
 }
 
 export async function upsertPrice(row: {
@@ -58,7 +54,7 @@ export async function upsertPrice(row: {
   source_url?: string | null;
 }): Promise<{ inserted: boolean }> {
   // RETURNING + ON CONFLICT DO NOTHING: rows is non-empty iff a row was inserted.
-  const rows = (await sql`
+  const rows = (await sqlClient()`
     INSERT INTO prices (bulletin_id, effective_date, gasoline_czk, diesel_czk, source_url)
     VALUES (${row.bulletin_id}, ${row.effective_date}, ${row.gasoline_czk},
             ${row.diesel_czk}, ${row.source_url ?? null})
@@ -68,7 +64,7 @@ export async function upsertPrice(row: {
 }
 
 export async function getLatest(): Promise<PriceRow | undefined> {
-  const rows = (await sql`
+  const rows = (await sqlClient()`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
            gasoline_czk, diesel_czk, source_url,
@@ -80,7 +76,7 @@ export async function getLatest(): Promise<PriceRow | undefined> {
 }
 
 export async function getHistory(limit = 30): Promise<PriceRow[]> {
-  const rows = (await sql`
+  const rows = (await sqlClient()`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
            gasoline_czk, diesel_czk, source_url,
@@ -93,7 +89,7 @@ export async function getHistory(limit = 30): Promise<PriceRow[]> {
 
 /** Set of bulletin identifiers already in the database. */
 export async function getKnownBulletinIds(): Promise<Set<string>> {
-  const rows = (await sql`
+  const rows = (await sqlClient()`
     SELECT bulletin_id FROM prices WHERE bulletin_id IS NOT NULL`) as {
     bulletin_id: string;
   }[];
