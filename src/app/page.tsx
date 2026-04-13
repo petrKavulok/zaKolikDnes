@@ -34,7 +34,7 @@ export default async function Page() {
           <div>
             <h1 className="text-3xl font-bold">Za kolik dnes?</h1>
             <p className="mt-1 text-slate-400">
-              Maximální ceny pohonných hmot z Cenového věstníku MF ČR.
+              Maximální ceny pohonných hmot přímo od Alenky(z Cenového věstníku MF ČR).
             </p>
           </div>
         </div>
