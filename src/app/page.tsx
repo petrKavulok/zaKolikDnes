@@ -32,7 +32,7 @@ export default async function Page() {
             className="mt-1 h-12 w-12 rounded"
           />
           <div>
-            <h1 className="text-3xl font-bold">zaKolikDnes</h1>
+            <h1 className="text-3xl font-bold">Za kolik dnes?</h1>
             <p className="mt-1 text-slate-400">
               Maximální ceny pohonných hmot z Cenového věstníku MF ČR.
             </p>
