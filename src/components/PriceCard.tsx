@@ -3,11 +3,13 @@ interface Props {
   label: string;
   price: number | null;
   effectiveDate: string | null;
+  effectiveDateIso?: string | null; // raw YYYY-MM-DD for <time> element
   accent: string; // tailwind text color class
   previousPrice?: number | null;
   previousLabel?: string | null; // e.g. "než včera", "než v pátek"
   tomorrowPrice?: number | null;
   validUntil?: string | null;
+  validUntilIso?: string | null; // raw YYYY-MM-DD for <time> element
 }
 
 function PriceDiff({ current, previous, suffix }: { current: number; previous: number; suffix?: string | null }) {
@@ -27,11 +29,13 @@ export function PriceCard({
   label,
   price,
   effectiveDate,
+  effectiveDateIso,
   accent,
   previousPrice,
   previousLabel,
   tomorrowPrice,
   validUntil,
+  validUntilIso,
 }: Props) {
   return (
     <div className="rounded-2xl bg-slate-800/60 p-6 shadow-lg ring-1 ring-white/5">
@@ -42,8 +46,12 @@ export function PriceCard({
       </div>
 
       <div className="mt-3 text-xs text-slate-500">
-        {effectiveDate ? `s platností od ${effectiveDate}` : 'žádná data'}
-        {validUntil && ` · platné do ${validUntil}`}
+        {effectiveDate ? (
+          <>s platností od <time dateTime={effectiveDateIso ?? undefined}>{effectiveDate}</time></>
+        ) : 'žádná data'}
+        {validUntil && (
+          <>{' · platné do '}<time dateTime={validUntilIso ?? undefined}>{validUntil}</time></>
+        )}
       </div>
 
       {price != null && previousPrice != null && (

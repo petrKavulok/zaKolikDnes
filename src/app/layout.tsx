@@ -1,22 +1,34 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
 import andrejko from '@/assets/andrejko.png';
 import alca from '@/assets/alca.png';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Za kolik dnes?',
-  description: 'Aktuální maximální ceny benzínu Natural 95 a nafty z Cenového věstníku MF ČR.',
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: '/',
+    types: {
+      'application/rss+xml': [{ url: '/feed.xml', title: `${SITE_NAME} – RSS` }],
+    },
+  },
   openGraph: {
-    title: 'Za kolik dnes?',
-    description: 'Aktuální maximální ceny benzínu Natural 95 a nafty z Cenového věstníku MF ČR.',
-    images: [{ url: '/og-image.png' }],
+    title: `${SITE_NAME} – Maximální ceny benzínu a nafty`,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: 'cs_CZ',
+    type: 'website',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Za kolik dnes? – aktuální ceny pohonných hmot v ČR' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Za kolik dnes?',
-    description: 'Aktuální maximální ceny benzínu Natural 95 a nafty z Cenového věstníku MF ČR.',
-    images: ['/og-image.png'],
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [{ url: '/og-image.png', alt: 'Za kolik dnes? – aktuální ceny pohonných hmot v ČR' }],
   },
   manifest: '/manifest.json',
   icons: {
