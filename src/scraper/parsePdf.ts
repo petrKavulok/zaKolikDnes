@@ -41,10 +41,12 @@ export function extractPricesFromText(text: string): Partial<ParsedPrices> {
     priceNear(flat, /\bnafta\b/i) ??
     priceNear(flat, /\bdiesel\b/i);
 
-  // Effective date: usually "s účinností od 1. ledna 2026" or "platnost od …".
-  // Allow dots in the window — Czech dates themselves contain dots ("1. ledna 2026").
+  // Effective date: "… maximálních cen pohonných hmot na 14. dubna 2026"
+  // or "s účinností od 1. ledna 2026" / "platnost od …".
   const dateContext =
-    flat.match(/(?:[úu]činnost[íi]?|platnost[íi]?)\s*od\s+.{0,80}/i)?.[0] ?? flat;
+    flat.match(/pohonných\s+hmot\s+na\s+.{0,80}/i)?.[0] ??
+    flat.match(/(?:[úu]činnost[íi]?|platnost[íi]?)\s*od\s+.{0,80}/i)?.[0] ??
+    flat;
   const effective_date = parseCzechDate(dateContext) ?? undefined;
 
   if (gasoline == null || diesel == null) {
