@@ -7,6 +7,17 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Za kolik dnes?',
   description: 'Aktuální maximální ceny benzínu Natural 95 a nafty z Cenového věstníku MF ČR.',
+  openGraph: {
+    title: 'Za kolik dnes?',
+    description: 'Aktuální maximální ceny benzínu Natural 95 a nafty z Cenového věstníku MF ČR.',
+    images: [{ url: '/og-image.png' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Za kolik dnes?',
+    description: 'Aktuální maximální ceny benzínu Natural 95 a nafty z Cenového věstníku MF ČR.',
+    images: ['/og-image.png'],
+  },
   manifest: '/manifest.json',
   icons: {
     icon: [
