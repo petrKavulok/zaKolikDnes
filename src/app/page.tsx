@@ -129,7 +129,7 @@ export default async function Page() {
           <div>
             <dt className="font-medium text-slate-200">Odkud data o cenách pochází?</dt>
             <dd className="mt-1 text-slate-400">
-              Data pochází z Cenového věstníku Ministerstva financí České republiky (<a href="https://www.mfcr.cz/cs/legislativa/cenovy-vestnik" className="underline hover:text-slate-200" rel="noopener">mfcr.cz</a>). Jedná se o oficiální regulované maximální ceny.
+              Data pochází z Cenového věstníku Ministerstva financí České republiky (<a href="https://www.https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik" className="underline hover:text-slate-200" rel="noopener">mfcr.cz</a>). Jedná se o oficiální regulované maximální ceny.
             </dd>
           </div>
           <div>

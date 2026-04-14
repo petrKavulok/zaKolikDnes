@@ -20,7 +20,7 @@ export function GET() {
 Each price record contains: bulletin_id, effective_date (YYYY-MM-DD), gasoline_czk (CZK/l), diesel_czk (CZK/l), source_url, imported_at.
 
 ## Update Schedule
-New prices are published Monday–Friday at 14:05 Prague time (CET/CEST). Data source: https://www.mfcr.cz/cs/legislativa/cenovy-vestnik
+New prices are published Monday–Friday at 14:05 Prague time (CET/CEST). Data source: https://www.https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik
 `;
 
   return new Response(text, {

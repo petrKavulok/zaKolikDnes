@@ -90,7 +90,7 @@ There are no explicit rate limits. However, data changes at most once per busine
 ## Data Source
 
 All data originates from the **Cenový věstník Ministerstva financí České republiky** (Price Bulletin of the Ministry of Finance of the Czech Republic):
-https://www.mfcr.cz/cs/legislativa/cenovy-vestnik
+https://www.https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik
 
 ## CORS
 
