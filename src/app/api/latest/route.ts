@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
-import { getLatest } from '@/lib/db';
+import { getLatest } from '../../../lib/db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
