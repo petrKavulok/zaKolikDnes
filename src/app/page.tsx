@@ -4,6 +4,7 @@ import { formatDate, todayPrague, tomorrowPrague, addDays, nextUpdateLabel, prev
 import { PriceCard } from '@/components/PriceCard';
 import { PriceChart, ChartPoint } from '@/components/PriceChart';
 import { RefreshButton } from '@/components/RefreshButton';
+import { ChciSlevuButton } from '@/components/ChciSlevuButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,7 +37,7 @@ export default async function Page() {
     : null;
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className="relative z-10 mx-auto max-w-4xl px-4 py-10">
       <header className="mb-8 flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <img
@@ -49,7 +50,7 @@ export default async function Page() {
           <div>
             <h1 className="text-3xl font-bold">Za kolik dnes?</h1>
             <p className="mt-1 text-slate-400">
-              Maximální ceny pohonných hmot přímo od Alenky(z Cenového věstníku MF ČR).
+              Maximální ceny pohonných hmot z pekárny od Alenky a Andrejka (z Cenového věstníku MF ČR).
             </p>
           </div>
         </div>
@@ -84,6 +85,10 @@ export default async function Page() {
         <h2 className="mb-3 text-lg font-semibold">Historie (30 dní)</h2>
         <PriceChart data={chartData} />
       </section>
+
+      <div className="mt-8 text-center">
+        <ChciSlevuButton />
+      </div>
 
       <footer className="mt-10 text-xs text-slate-500">
         Naposledy importováno: {current ? formatDate(current.imported_at) : '—'}

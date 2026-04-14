@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
+import andrejko from '@/assets/andrejko.png';
+import alca from '@/assets/alca.png';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -38,6 +40,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="cs">
       <body>
+        <div className="floaters" aria-hidden="true">
+          <img src={andrejko.src} alt="" />
+          <img src={alca.src} alt="" />
+          <img src={andrejko.src} alt="" />
+          <img src={alca.src} alt="" />
+          <img src={andrejko.src} alt="" />
+          <img src={alca.src} alt="" />
+          <img src={andrejko.src} alt="" />
+          <img src={alca.src} alt="" />
+          <img src={andrejko.src} alt="" />
+          <img src={alca.src} alt="" />
+        </div>
         {children}
         <Analytics />
       </body>

@@ -8,3 +8,49 @@ body {
   color: #e6eaf3;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
+/* Floating background images */
+.floaters {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.floaters img {
+  position: absolute;
+  width: 100px;
+  opacity: 0.2;
+  will-change: translate, rotate;
+  animation: float 20s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: var(--dx, 20px) var(--dy, -30px); }
+}
+
+.floaters img:nth-child(1) { top: 5%;  left: 8%;  --dx: 25px;  --dy: -35px; rotate: -12deg; animation-duration: 18s; }
+.floaters img:nth-child(2) { top: 15%; left: 75%; --dx: -20px; --dy: -40px; rotate: 8deg;   animation-duration: 22s; animation-delay: 2s; width: 80px; }
+.floaters img:nth-child(3) { top: 45%; left: 20%; --dx: 30px;  --dy: 25px;  rotate: -5deg;  animation-duration: 25s; animation-delay: 4s; width: 110px; }
+.floaters img:nth-child(4) { top: 60%; left: 85%; --dx: -15px; --dy: -20px; rotate: 15deg;  animation-duration: 19s; animation-delay: 1s; width: 70px; }
+.floaters img:nth-child(5) { top: 80%; left: 50%; --dx: 20px;  --dy: -30px; rotate: -18deg; animation-duration: 24s; animation-delay: 6s; }
+.floaters img:nth-child(6) { top: 30%; left: 55%; --dx: -25px; --dy: 20px;  rotate: 10deg;  animation-duration: 21s; animation-delay: 3s; width: 90px; }
+
+/* Checkmark button animations */
+@keyframes checkpop {
+  0%   { scale: 0; }
+  60%  { scale: 1.2; }
+  100% { scale: 1; }
+}
+
+@keyframes checkpopout {
+  0%   { scale: 1; opacity: 1; }
+  100% { scale: 0; opacity: 0; }
+}
+
+@keyframes checkdraw {
+  from { stroke-dashoffset: 30; }
+  to   { stroke-dashoffset: 0; }
+}

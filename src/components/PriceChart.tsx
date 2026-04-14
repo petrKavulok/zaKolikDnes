@@ -34,7 +34,7 @@ export function PriceChart({ data }: { data: ChartPoint[] }) {
           />
           <Legend />
           <Line type="monotone" dataKey="gasoline" name="Natural 95" stroke="#fbbf24" dot={false} strokeWidth={2} />
-          <Line type="monotone" dataKey="diesel" name="Nafta" stroke="#60a5fa" dot={false} strokeWidth={2} />
+          <Line type="monotone" dataKey="diesel" name="Diesel" stroke="#60a5fa" dot={false} strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </div>
