@@ -41,11 +41,11 @@ export default async function Page() {
       <header className="mb-8 flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <img
-            src="/pump.png"
+            src="/og-image.png"
             alt="zaKolikDnes logo"
-            width={100}
+
             height={100}
-            className="mt-1 h-12 w-12 rounded"
+            className="mt-1 h-12 scale-x-[-1] rounded"
           />
           <div>
             <h1 className="text-3xl font-bold">Za kolik dnes?</h1>
