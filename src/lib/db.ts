@@ -77,6 +77,55 @@ export async function getHistory(limit = 30): Promise<PriceRow[]> {
   return rows;
 }
 
+export interface PriceContext {
+  current: PriceRow | undefined;
+  next: PriceRow | undefined;
+  previous: PriceRow | undefined;
+}
+
+/** Fetch the price active on `today`, the next future price, and the previous price. */
+export async function getPriceContext(today: string): Promise<PriceContext> {
+  const rows = (await sql`
+    (SELECT 'current' AS role, bulletin_id,
+            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
+            gasoline_czk, diesel_czk, source_url,
+            imported_at::text AS imported_at
+       FROM prices
+      WHERE effective_date <= ${today}::date
+      ORDER BY effective_date DESC
+      LIMIT 1)
+    UNION ALL
+    (SELECT 'next' AS role, bulletin_id,
+            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
+            gasoline_czk, diesel_czk, source_url,
+            imported_at::text AS imported_at
+       FROM prices
+      WHERE effective_date > ${today}::date
+      ORDER BY effective_date ASC
+      LIMIT 1)
+    UNION ALL
+    (SELECT 'previous' AS role, bulletin_id,
+            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
+            gasoline_czk, diesel_czk, source_url,
+            imported_at::text AS imported_at
+       FROM prices
+      WHERE effective_date < (
+        SELECT effective_date FROM prices
+         WHERE effective_date <= ${today}::date
+         ORDER BY effective_date DESC LIMIT 1
+      )
+      ORDER BY effective_date DESC
+      LIMIT 1)
+  `) as (PriceRow & { role: string })[];
+
+  const byRole = Object.fromEntries(rows.map((r) => [r.role, r]));
+  return {
+    current: byRole['current'],
+    next: byRole['next'],
+    previous: byRole['previous'],
+  };
+}
+
 /** Set of bulletin identifiers already in the database. */
 export async function getKnownBulletinIds(): Promise<Set<string>> {
   const rows = (await sql`

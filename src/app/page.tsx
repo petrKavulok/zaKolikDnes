@@ -1,6 +1,6 @@
 // Home page — server component reading directly from the database.
-import { getHistory, getLatest } from '@/lib/db';
-import { formatDate } from '@/lib/date';
+import { getPriceContext, getHistory } from '@/lib/db';
+import { formatDate, todayPrague, tomorrowPrague, addDays, nextUpdateLabel, previousPriceLabel } from '@/lib/date';
 import { PriceCard } from '@/components/PriceCard';
 import { PriceChart, ChartPoint } from '@/components/PriceChart';
 import { RefreshButton } from '@/components/RefreshButton';
@@ -8,15 +8,32 @@ import { RefreshButton } from '@/components/RefreshButton';
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const latest = await getLatest();
-  const history = await getHistory(30);
+  const today = todayPrague();
+  const tomorrow = tomorrowPrague();
+
+  const [{ current, next, previous }, history] = await Promise.all([
+    getPriceContext(today),
+    getHistory(30),
+  ]);
 
   // Chart wants oldest → newest for a nice left-to-right line.
   const chartData: ChartPoint[] = [...history].reverse().map((r) => ({
-    date: formatDate(r.effective_date),
+    date: r.effective_date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${+d}.${+m}.${y}`),
     gasoline: r.gasoline_czk,
     diesel: r.diesel_czk,
   }));
+
+  const hasTomorrowPrice = next?.effective_date === tomorrow;
+
+  // Show "valid until" only when the next price is NOT tomorrow
+  const validUntil =
+    next && !hasTomorrowPrice
+      ? formatDate(addDays(next.effective_date, -1))
+      : null;
+
+  const prevLabel = previous
+    ? previousPriceLabel(previous.effective_date)
+    : null;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -43,15 +60,23 @@ export default async function Page() {
         <PriceCard
           label="Natural 95"
           accent="text-amber-400"
-          price={latest?.gasoline_czk ?? null}
-          effectiveDate={latest ? formatDate(latest.effective_date) : null}
+          price={current?.gasoline_czk ?? null}
+          effectiveDate={current ? formatDate(current.effective_date) : null}
+          previousPrice={previous?.gasoline_czk}
+          previousLabel={prevLabel}
+          tomorrowPrice={hasTomorrowPrice ? next.gasoline_czk : null}
+          validUntil={validUntil}
         />
         <PriceCard
           label="Diesel"
           aria-label="Vin Diesel"
           accent="text-sky-400"
-          price={latest?.diesel_czk ?? null}
-          effectiveDate={latest ? formatDate(latest.effective_date) : null}
+          price={current?.diesel_czk ?? null}
+          effectiveDate={current ? formatDate(current.effective_date) : null}
+          previousPrice={previous?.diesel_czk}
+          previousLabel={prevLabel}
+          tomorrowPrice={hasTomorrowPrice ? next.diesel_czk : null}
+          validUntil={validUntil}
         />
       </section>
 
@@ -61,7 +86,8 @@ export default async function Page() {
       </section>
 
       <footer className="mt-10 text-xs text-slate-500">
-        Naposledy importováno: {latest ? formatDate(latest.imported_at) : '—'}
+        Naposledy importováno: {current ? formatDate(current.imported_at) : '—'}
+        {' · '}Další aktualizace {nextUpdateLabel()}
       </footer>
     </main>
   );
