@@ -64,16 +64,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="cs">
       <body>
         <div className="floaters" aria-hidden="true">
-          <img src={andrejko.src} alt="" />
-          <img src={alca.src} alt="" />
-          <img src={andrejko.src} alt="" />
-          <img src={alca.src} alt="" />
-          <img src={andrejko.src} alt="" />
-          <img src={alca.src} alt="" />
-          <img src={andrejko.src} alt="" />
-          <img src={alca.src} alt="" />
-          <img src={andrejko.src} alt="" />
-          <img src={alca.src} alt="" />
         </div>
         {children}
         <Analytics />
