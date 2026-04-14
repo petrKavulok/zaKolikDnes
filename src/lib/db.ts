@@ -1,21 +1,15 @@
-// Postgres wrapper — Neon serverless driver over HTTP.
-//
-// IMPORTANT: uses dynamic import() of @neondatabase/serverless rather than a
-// top-level static import. A static `import { neon }` in this file causes the
-// bundled neon client to silently return 0 rows in the Vercel production
-// bundle, while the same static import directly in route handlers works fine.
-// Dynamic import sidesteps whatever bundler transform causes this.
+// Postgres wrapper — Neon serverless driver over HTTP. Works in Vercel
+// Functions without a persistent connection pool; @vercel/postgres is
+// deprecated in favour of direct drivers.
 //
 // Dedup model:
-//   * `bulletin_id` ("9/2026") is the canonical de-duplication key.
+//   * `bulletin_id` ("9/2026") is the canonical de-duplication key — it is
+//     known *before* we download anything, so the orchestrator can skip
+//     bulletins it has already processed without fetching the PDF.
 //   * `effective_date` stays unique too (one bulletin = one effective date).
+import { neon } from '@neondatabase/serverless';
 
-async function getSql() {
-  const { neon } = await import('@neondatabase/serverless');
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL is not set');
-  return neon(url);
-}
+const sql = neon(process.env.DATABASE_URL!);
 
 export interface PriceRow {
   bulletin_id: string;
@@ -29,7 +23,6 @@ export interface PriceRow {
 // One-time schema bootstrap. Call from `npm run db:migrate` — NOT on every
 // cold start.
 export async function ensureSchema(): Promise<void> {
-  const sql = await getSql();
   await sql`
     CREATE TABLE IF NOT EXISTS prices (
       bulletin_id    TEXT PRIMARY KEY,
@@ -50,7 +43,6 @@ export async function upsertPrice(row: {
   diesel_czk: number;
   source_url?: string | null;
 }): Promise<{ inserted: boolean }> {
-  const sql = await getSql();
   // RETURNING + ON CONFLICT DO NOTHING: rows is non-empty iff a row was inserted.
   const rows = (await sql`
     INSERT INTO prices (bulletin_id, effective_date, gasoline_czk, diesel_czk, source_url)
@@ -62,7 +54,6 @@ export async function upsertPrice(row: {
 }
 
 export async function getLatest(): Promise<PriceRow | undefined> {
-  const sql = await getSql();
   const rows = (await sql`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
@@ -75,7 +66,6 @@ export async function getLatest(): Promise<PriceRow | undefined> {
 }
 
 export async function getHistory(limit = 30): Promise<PriceRow[]> {
-  const sql = await getSql();
   const rows = (await sql`
     SELECT bulletin_id,
            to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
@@ -89,7 +79,6 @@ export async function getHistory(limit = 30): Promise<PriceRow[]> {
 
 /** Set of bulletin identifiers already in the database. */
 export async function getKnownBulletinIds(): Promise<Set<string>> {
-  const sql = await getSql();
   const rows = (await sql`
     SELECT bulletin_id FROM prices WHERE bulletin_id IS NOT NULL`) as {
     bulletin_id: string;
