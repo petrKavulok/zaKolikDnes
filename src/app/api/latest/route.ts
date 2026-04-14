@@ -4,6 +4,7 @@ import type { PriceRow } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 0;
 
 export async function GET() {
   const sql = neon(process.env.DATABASE_URL!);
