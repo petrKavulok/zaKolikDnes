@@ -1,18 +1,36 @@
-// Home page — server component reading directly from SQLite (no HTTP hop).
-import { getHistory, getLatest } from '@/lib/db';
+// Home page — server component with inline DB queries to avoid RSC bundler
+// breaking the neon tagged-template API when imported across module boundaries.
+import { neon } from '@neondatabase/serverless';
 import { formatDate } from '@/lib/date';
 import { PriceCard } from '@/components/PriceCard';
 import { PriceChart, ChartPoint } from '@/components/PriceChart';
 import { RefreshButton } from '@/components/RefreshButton';
+import type { PriceRow } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const latest = await getLatest();
-  const history = await getHistory(30);
-  // DEBUG: surface DB state in the dev server console
-  console.log('[page] latest:', latest);
-  console.log('[page] history length:', history.length, 'first:', history[0]);
+  const sql = neon(process.env.DATABASE_URL!);
+
+  const latestRows = (await sql`
+    SELECT bulletin_id,
+           to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
+           gasoline_czk, diesel_czk, source_url,
+           imported_at::text AS imported_at
+      FROM prices
+     ORDER BY effective_date DESC
+     LIMIT 1`) as PriceRow[];
+  const latest = latestRows[0] as PriceRow | undefined;
+
+  const history = (await sql`
+    SELECT bulletin_id,
+           to_char(effective_date, 'YYYY-MM-DD') AS effective_date,
+           gasoline_czk, diesel_czk, source_url,
+           imported_at::text AS imported_at
+      FROM prices
+     ORDER BY effective_date DESC
+     LIMIT 30`) as PriceRow[];
+
   // Chart wants oldest → newest for a nice left-to-right line.
   const chartData: ChartPoint[] = [...history].reverse().map((r) => ({
     date: formatDate(r.effective_date),
