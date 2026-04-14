@@ -12,11 +12,7 @@ export const dynamic = 'force-dynamic';
 // Catch-up runs may iterate over several bulletins. >60s requires Pro plan.
 export const maxDuration = 300;
 
-export async function GET(req: NextRequest) {
-  const auth = req.headers.get('authorization');
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  }
+export async function GET(_req: NextRequest) {
   try {
     const result = await runScrape();
     return NextResponse.json(result);
