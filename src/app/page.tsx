@@ -91,6 +91,16 @@ export default async function Page() {
           />
         </section>
 
+        <div className="mt-4 rounded-2xl bg-slate-800/40 p-4 text-center text-sm text-slate-300 ring-1 ring-white/5">
+          Chcete tyto ceny na svém webu?{' '}
+          <a
+            href="/embed"
+            className="font-medium text-amber-400 underline hover:text-amber-300"
+          >
+            Vložte widget →
+          </a>
+        </div>
+
         <section className="mt-10">
           <h2 className="mb-3 text-lg font-semibold">Historie (30 dní)</h2>
           <PriceChart data={chartData} />
@@ -140,6 +150,14 @@ export default async function Page() {
               <a href={`${SITE_URL}/api/history`} className="underline hover:text-slate-200">JSON API (historie)</a>,{' '}
               <a href={`${SITE_URL}/feed.xml`} className="underline hover:text-slate-200">RSS feed</a> a{' '}
               <a href={`${SITE_URL}/api/openapi.json`} className="underline hover:text-slate-200">OpenAPI specifikaci</a>.
+            </dd>
+          </div>
+          <div>
+            <dt className="font-medium text-slate-200">Mohu zobrazit aktuální ceny na svém webu?</dt>
+            <dd className="mt-1 text-slate-400">
+              Ano — použijte náš{' '}
+              <a href="/embed" className="underline hover:text-slate-200">vložitelný widget</a>.
+              Jeden řádek HTML, bez závislostí, návod a živá ukázka uvnitř.
             </dd>
           </div>
         </dl>
