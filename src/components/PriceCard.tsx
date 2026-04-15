@@ -1,4 +1,6 @@
 // Stateless display card for one fuel's current price with optional comparison data.
+import { AnimatedPrice } from './AnimatedPrice';
+
 interface Props {
   label: string;
   price: number | null;
@@ -20,7 +22,7 @@ function PriceDiff({ current, previous, suffix }: { current: number; previous: n
   const isUp = diff > 0;
   return (
     <span className={isUp ? 'text-red-400' : 'text-emerald-400'}>
-      {isUp ? '↑' : '↓'} o {Math.abs(diff).toFixed(2)} Kč {isUp ? 'více' : 'méně'}{suffix ? ` ${suffix}` : ''}
+      {isUp ? '↑' : '↓'} o <AnimatedPrice value={Math.abs(diff)} /> Kč {isUp ? 'více' : 'méně'}{suffix ? ` ${suffix}` : ''}
     </span>
   );
 }
@@ -41,7 +43,7 @@ export function PriceCard({
     <div className="rounded-2xl bg-slate-800/60 p-6 shadow-lg ring-1 ring-white/5">
       <div className="text-sm uppercase tracking-wide text-slate-400">{label}</div>
       <div className={`mt-2 text-5xl font-semibold ${accent}`}>
-        {price != null ? price.toFixed(2) : '—'}{' '}
+        {price != null ? <AnimatedPrice value={price} /> : '—'}{' '}
         <span className="text-2xl text-slate-400">Kč/l</span>
       </div>
 
@@ -64,7 +66,7 @@ export function PriceCard({
         <div className="mt-3 rounded-lg bg-slate-700/40 px-3 py-2 text-sm">
           <span className="text-slate-400">Zítra: </span>
           <span className="font-medium text-slate-200">
-            {tomorrowPrice.toFixed(2)} Kč/l
+            <AnimatedPrice value={tomorrowPrice} /> Kč/l
           </span>{' '}
           <span className="text-xs">
             <PriceDiff current={tomorrowPrice} previous={price} />

@@ -5,7 +5,10 @@ export function apiHeaders(extra?: Record<string, string>): HeadersInit {
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
-    'X-Data-Source': 'Czech Ministry of Finance Price Bulletin (Cenový věstník MF ČR)',
+    // HTTP header values are ByteString — non-ASCII bytes (the Czech diacritics
+    // ě/č/ý) make undici throw on serialisation. ASCII-only variant of the same
+    // name: "Cenový věstník MF ČR" → "Cenovy vestnik MF CR".
+    'X-Data-Source': 'Czech Ministry of Finance Price Bulletin (Cenovy vestnik MF CR)',
     'X-Update-Schedule': 'Mon-Fri 14:05 CET/CEST',
     ...extra,
   };
