@@ -41,7 +41,7 @@
       locale: 'en-GB',
     },
     cs: {
-      title: 'Ceny PHM',
+      title: 'Zastropované Ceny PHM',
       gasoline: 'Benzín',
       diesel: 'Nafta',
       updated: 'Aktualizováno',

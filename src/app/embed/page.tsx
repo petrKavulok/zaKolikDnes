@@ -43,11 +43,18 @@ function DemoSlot({ theme, lang }: { theme: Theme; lang: Lang }) {
       <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
         {variantLabel(theme, lang)}
       </div>
+      {/*
+        data-api="/" — demo slots hit the current origin so each deployment
+        (local / preview / prod) validates its own API instead of always
+        fetching production. Third-party embedders keep the widget's default,
+        which is the prod zakolikdnes.cz base URL.
+      */}
       <div
         className="fuel-cap-widget"
         id={slotId}
         data-theme={theme}
         data-lang={lang}
+        data-api="/"
       />
     </div>
   );
