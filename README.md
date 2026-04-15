@@ -46,6 +46,62 @@ npm run db:migrate
 | POST   | `/api/refresh`     | Manually trigger a scrape (admin token req.)       |
 | GET    | `/api/cron/scrape` | Vercel Cron endpoint (requires `CRON_SECRET` auth) |
 
+## Embeddable widget
+
+A single-file JavaScript widget (`public/widget.js`) can be dropped into any website to display the current fuel price cap. No build step, no dependencies, Shadow-DOM-isolated so it won't clash with host-page CSS.
+
+### Quick start
+
+Drop this anywhere in your HTML — the widget auto-mounts at the end of `<body>`:
+
+```html
+<script src="https://zakolikdnes.cz/widget.js"></script>
+```
+
+Control theme and language:
+
+```html
+<script src="https://zakolikdnes.cz/widget.js"
+        data-theme="dark"
+        data-lang="cs"></script>
+```
+
+Mount into a specific element instead of auto-appending:
+
+```html
+<div id="fuel-cap-widget"></div>
+<script src="https://zakolikdnes.cz/widget.js" data-theme="dark"></script>
+```
+
+### Configuration
+
+All attributes go on the `<script>` tag (or on the host element, which takes precedence — useful when the script is injected dynamically):
+
+| Attribute     | Values              | Default     | Description                                            |
+|---------------|---------------------|-------------|--------------------------------------------------------|
+| `data-theme`  | `light` \| `dark`   | `light`     | Colour scheme.                                         |
+| `data-lang`   | `en` \| `cs`        | `en`        | UI labels, number and date formatting.                 |
+| `data-target` | CSS selector        | —           | Explicit mount target. Overrides `#fuel-cap-widget`.   |
+| `data-api`    | URL                 | production  | API base override (for local testing or self-hosting). |
+
+### What it does
+
+- Fetches `/api/latest` (3 s timeout) and renders `Gasoline` / `Diesel` / `Updated` in an isolated Shadow DOM.
+- Adds a ↑ ↓ — trend indicator by diffing against `/api/history[1]` (best-effort; widget still renders if the history call fails).
+- Animates the numbers on load (respects `prefers-reduced-motion`).
+- Shows `Data unavailable` under the title on any fetch / validation failure.
+
+### Mount resolution order
+
+1. `data-target` selector (on the script), if it resolves to one or more elements.
+2. Every `.fuel-cap-widget` on the page (multi-instance).
+3. `#fuel-cap-widget`, if present.
+4. A fresh `<div>` appended to `<body>`.
+
+### Live preview
+
+[`/embed`](https://zakolikdnes.cz/embed) renders all four `theme × lang` variants side-by-side with copy-paste snippets.
+
 ## Tests
 
 ```bash
