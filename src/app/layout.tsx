@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
 import andrejko from '@/assets/andrejko.png';
 import alca from '@/assets/alca.png';
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
