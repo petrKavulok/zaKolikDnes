@@ -126,6 +126,32 @@ export async function getPriceContext(today: string): Promise<PriceContext> {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Sleva click tracking
+// ---------------------------------------------------------------------------
+
+export async function ensureClicksSchema(): Promise<void> {
+  await sql`
+    CREATE TABLE IF NOT EXISTS sleva_clicks (
+      id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      clicked_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+      source      TEXT NOT NULL DEFAULT 'main'
+    )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_sleva_clicks_clicked_at ON sleva_clicks(clicked_at)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS sleva_stats (
+      id            INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+      total_clicks  BIGINT NOT NULL DEFAULT 0
+    )`;
+  await sql`INSERT INTO sleva_stats (id, total_clicks) VALUES (1, 0) ON CONFLICT (id) DO NOTHING`;
+}
+
+export async function recordSlevaClick(source: string = 'main'): Promise<void> {
+  await sql`INSERT INTO sleva_clicks (source) VALUES (${source})`;
+  await sql`UPDATE sleva_stats SET total_clicks = total_clicks + 1 WHERE id = 1`;
+}
+
 /** Set of bulletin identifiers already in the database. */
 export async function getKnownBulletinIds(): Promise<Set<string>> {
   const rows = (await sql`

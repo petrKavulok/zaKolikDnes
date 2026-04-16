@@ -3,9 +3,9 @@
 //   POSTGRES_URL=... npm run db:migrate
 //
 // Idempotent — safe to re-run.
-import { ensureSchema } from '../src/lib/db';
+import { ensureSchema, ensureClicksSchema } from '../src/lib/db';
 
-ensureSchema()
+Promise.all([ensureSchema(), ensureClicksSchema()])
   .then(() => {
     console.log('schema ensured');
     process.exit(0);

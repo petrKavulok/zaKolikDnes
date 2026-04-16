@@ -6,11 +6,18 @@ import alca from '@/assets/alca.png';
 
 const sources = [andrejko.src, alca.src];
 
-export function ChciSlevuButton() {
+export function ChciSlevuButton({ source = 'main' }: { source?: 'main' | 'embed' } = {}) {
   const [phase, setPhase] = useState<'idle' | 'in' | 'out'>('idle');
   const timeout = useRef<ReturnType<typeof setTimeout>>(null);
 
   const spawn = useCallback(() => {
+    fetch('/api/clicks/sleva', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source }),
+      keepalive: true,
+    }).catch(() => {});
+
     const container = document.querySelector('.floaters');
     if (!container) return;
 
@@ -47,7 +54,7 @@ export function ChciSlevuButton() {
       setPhase('out');
       timeout.current = setTimeout(() => setPhase('idle'), 300);
     }, 1200);
-  }, []);
+  }, [source]);
 
   return (
     <button
