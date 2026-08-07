@@ -2,11 +2,12 @@
 import Image from 'next/image';
 import { getPriceContext, getHistory } from '@/lib/db';
 import { formatDate, todayPrague, tomorrowPrague, addDays, nextUpdateLabel, previousPriceLabel } from '@/lib/date';
-import { SITE_URL } from '@/lib/constants';
+import { SITE_URL, REGULATION_ENDED_ISO } from '@/lib/constants';
 import { PriceCard } from '@/components/PriceCard';
 import { PriceChart, ChartPoint } from '@/components/PriceChart';
 import { RefreshButton } from '@/components/RefreshButton';
 import { ChciSlevuButton } from '@/components/ChciSlevuButton';
+import { RegulationEndedDialog } from '@/components/RegulationEndedDialog';
 import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 3600;
@@ -17,15 +18,19 @@ export default async function Page() {
 
   const [{ current, next, previous }, history] = await Promise.all([
     getPriceContext(today),
-    getHistory(30),
+    getHistory(60),
   ]);
 
-  // Chart wants oldest → newest for a nice left-to-right line.
-  const chartData: ChartPoint[] = [...history].reverse().map((r) => ({
-    date: r.effective_date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${+d}.${+m}.${y}`),
-    gasoline: r.gasoline_czk,
-    diesel: r.diesel_czk,
-  }));
+  // Chart ends on the last day of regulation; oldest → newest for the line.
+  const chartData: ChartPoint[] = [...history]
+    .filter((r) => r.effective_date <= REGULATION_ENDED_ISO)
+    .reverse()
+    .slice(-30)
+    .map((r) => ({
+      date: r.effective_date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${+d}.${+m}.${y}`),
+      gasoline: r.gasoline_czk,
+      diesel: r.diesel_czk,
+    }));
 
   const hasTomorrowPrice = next?.effective_date === tomorrow;
 
@@ -40,6 +45,7 @@ export default async function Page() {
 
   return (
     <main className="relative z-10 mx-auto max-w-4xl px-4 py-10">
+      <RegulationEndedDialog />
       <JsonLd current={current} />
 
       <header className="mb-8 flex items-start justify-between gap-4">
@@ -102,7 +108,9 @@ export default async function Page() {
         </div>
 
         <section className="mt-10">
-          <h2 className="mb-3 text-lg font-semibold">Historie (30 dní)</h2>
+          <h2 className="mb-3 text-lg font-semibold">
+            Historie regulace (do <time dateTime={REGULATION_ENDED_ISO}>19.&nbsp;7.&nbsp;2026</time>)
+          </h2>
           <PriceChart data={chartData} />
         </section>
       </article>

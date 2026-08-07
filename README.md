@@ -112,7 +112,7 @@ Covers the text-level extractor, validation rules (range, NaN, bad date) and a *
 
 ## Scheduler
 
-Vercel Cron triggers `GET /api/cron/scrape` on a schedule defined in [vercel.json](vercel.json) (currently `05 12 * * *` — daily at 12:05 UTC). The endpoint is protected by `CRON_SECRET` (Vercel injects the `Authorization: Bearer <CRON_SECRET>` header automatically).
+Vercel Cron for `/api/cron/scrape` is **disabled** (empty `crons` in [vercel.json](vercel.json)) after the Ministry of Finance ended fuel price regulation on 19 July 2026. The scrape endpoint remains available for manual use via `/api/refresh` if needed.
 
 ## Configuration
 

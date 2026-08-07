@@ -54,3 +54,7 @@ body {
   from { stroke-dashoffset: 30; }
   to   { stroke-dashoffset: 0; }
 }
+
+.regulation-ended-dialog::backdrop {
+  background: rgb(0 0 0 / 0.7);
+}
