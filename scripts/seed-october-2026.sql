@@ -72,6 +72,14 @@ VALUES
 
   -- Oct 22 Thu — CV 107/2026, also stored automatically by the cron
   ('direct/2026-10-22', '2026-10-22', 45.19, 48.60,
-   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/maximalni-pripustne-ceny-benzinu-a-nafty')
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/maximalni-pripustne-ceny-benzinu-a-nafty'),
+
+  -- Oct 23 Fri — CV 108/2026
+  ('direct/2026-10-23', '2026-10-23', 44.94, 48.70,
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-108-2026-65540'),
+
+  -- Oct 24–26 Sat/Sun/Mon — CV 109/2026, multi-day bulletin published Oct 23
+  ('direct/2026-10-24', '2026-10-24', 44.55, 48.69,
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-109-2026-65542')
 
 ON CONFLICT DO NOTHING;
