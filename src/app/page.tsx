@@ -17,19 +17,24 @@ export default async function Page() {
 
   const [{ current, next, previous }, history] = await Promise.all([
     getPriceContext(today),
-    getHistory(60),
+    getHistory(500),
   ]);
 
-  // Chart: last 30 entries from the resumed regulation period (Oct 2026+).
+  const toChartPoint = (r: { effective_date: string; gasoline_czk: number; diesel_czk: number }) => ({
+    date: r.effective_date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${+d}.${+m}.${y}`),
+    gasoline: r.gasoline_czk,
+    diesel: r.diesel_czk,
+  });
+
+  // Default view: last 30 entries from the resumed regulation period (Oct 2026+).
   const chartData: ChartPoint[] = [...history]
     .filter((r) => r.effective_date >= REGULATION_RESUMED_ISO)
     .reverse()
     .slice(-30)
-    .map((r) => ({
-      date: r.effective_date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${+d}.${+m}.${y}`),
-      gasoline: r.gasoline_czk,
-      diesel: r.diesel_czk,
-    }));
+    .map(toChartPoint);
+
+  // "Veškerá data" view: all entries ever, oldest → newest.
+  const chartDataAll: ChartPoint[] = [...history].reverse().map(toChartPoint);
 
   const hasTomorrowPrice = next?.effective_date === tomorrow;
 
@@ -118,7 +123,7 @@ export default async function Page() {
           <h2 className="mb-3 text-lg font-semibold">
             Vývoj regulovaných cen (od <time dateTime={REGULATION_RESUMED_ISO}>1.&nbsp;10.&nbsp;2026</time>)
           </h2>
-          <PriceChart data={chartData} />
+          <PriceChart data={chartData} allData={chartDataAll} />
         </section>
       </article>
 
