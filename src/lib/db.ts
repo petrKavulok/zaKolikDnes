@@ -48,7 +48,7 @@ export async function upsertPrice(row: {
     INSERT INTO prices (bulletin_id, effective_date, gasoline_czk, diesel_czk, source_url)
     VALUES (${row.bulletin_id}, ${row.effective_date}, ${row.gasoline_czk},
             ${row.diesel_czk}, ${row.source_url ?? null})
-    ON CONFLICT (bulletin_id) DO NOTHING
+    ON CONFLICT DO NOTHING
     RETURNING bulletin_id`) as unknown[];
   return { inserted: rows.length > 0 };
 }

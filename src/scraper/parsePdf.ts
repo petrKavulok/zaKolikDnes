@@ -38,12 +38,15 @@ export function extractPricesFromText(text: string): Partial<ParsedPrices> {
 
   const diesel =
     priceNear(flat, /motorov[áa]\s*nafta/i) ??
-    priceNear(flat, /\bnafta\b/i) ??
+    priceNear(flat, /\bnaft[ay]\b/i) ??
     priceNear(flat, /\bdiesel\b/i);
 
-  // Effective date: "… maximálních cen pohonných hmot na 14. dubna 2026"
-  // or "s účinností od 1. ledna 2026" / "platnost od …".
+  // Effective date patterns (newest-format first):
+  //   "Účinnost: 22. října 2026 od 00:00 …"  — new direct MF page
+  //   "… maximálních cen pohonných hmot na 14. dubna 2026"  — old PDF bulletin
+  //   "s účinností od …" / "platnosti od …"  — generic form
   const dateContext =
+    flat.match(/[úu]činnost\s*:\s*.{0,80}/i)?.[0] ??
     flat.match(/pohonných\s+hmot\s+na\s+.{0,80}/i)?.[0] ??
     flat.match(/(?:[úu]činnost[íi]?|platnost[íi]?)\s*od\s+.{0,80}/i)?.[0] ??
     flat;

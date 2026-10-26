@@ -2,12 +2,11 @@
 import Image from 'next/image';
 import { getPriceContext, getHistory } from '@/lib/db';
 import { formatDate, todayPrague, tomorrowPrague, addDays, nextUpdateLabel, previousPriceLabel } from '@/lib/date';
-import { SITE_URL, REGULATION_ENDED_ISO } from '@/lib/constants';
+import { SITE_URL, REGULATION_RESUMED_ISO } from '@/lib/constants';
 import { PriceCard } from '@/components/PriceCard';
 import { PriceChart, ChartPoint } from '@/components/PriceChart';
 import { RefreshButton } from '@/components/RefreshButton';
 import { ChciSlevuButton } from '@/components/ChciSlevuButton';
-import { RegulationEndedDialog } from '@/components/RegulationEndedDialog';
 import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 3600;
@@ -21,9 +20,9 @@ export default async function Page() {
     getHistory(60),
   ]);
 
-  // Chart ends on the last day of regulation; oldest → newest for the line.
+  // Chart: last 30 entries from the resumed regulation period (Oct 2026+).
   const chartData: ChartPoint[] = [...history]
-    .filter((r) => r.effective_date <= REGULATION_ENDED_ISO)
+    .filter((r) => r.effective_date >= REGULATION_RESUMED_ISO)
     .reverse()
     .slice(-30)
     .map((r) => ({
@@ -45,8 +44,16 @@ export default async function Page() {
 
   return (
     <main className="relative z-10 mx-auto max-w-4xl px-4 py-10">
-      <RegulationEndedDialog />
       <JsonLd current={current} />
+
+      <div className="mb-6 rounded-2xl bg-emerald-900/30 p-4 text-sm ring-1 ring-emerald-500/20">
+        <p className="font-semibold text-emerald-300">Regulace cen pohonných hmot obnovena</p>
+        <p className="mt-1 text-slate-300">
+          Ministerstvo financí ČR obnovilo cenovou regulaci pohonných hmot od{' '}
+          <time dateTime={REGULATION_RESUMED_ISO}>1.&nbsp;října&nbsp;2026</time>.
+          Maximální ceny jsou každý pracovní den aktualizovány ve 14:00.
+        </p>
+      </div>
 
       <header className="mb-8 flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
@@ -109,7 +116,7 @@ export default async function Page() {
 
         <section className="mt-10">
           <h2 className="mb-3 text-lg font-semibold">
-            Historie regulace (do <time dateTime={REGULATION_ENDED_ISO}>19.&nbsp;7.&nbsp;2026</time>)
+            Vývoj regulovaných cen (od <time dateTime={REGULATION_RESUMED_ISO}>1.&nbsp;10.&nbsp;2026</time>)
           </h2>
           <PriceChart data={chartData} />
         </section>
@@ -147,7 +154,7 @@ export default async function Page() {
           <div>
             <dt className="font-medium text-slate-200">Odkud data o cenách pochází?</dt>
             <dd className="mt-1 text-slate-400">
-              Data pochází z Cenového věstníku Ministerstva financí České republiky (<a href="https://www.https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik" className="underline hover:text-slate-200" rel="noopener">mfcr.cz</a>). Jedná se o oficiální regulované maximální ceny.
+              Data pochází z webu Ministerstva financí České republiky (<a href="https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/maximalni-pripustne-ceny-benzinu-a-nafty" className="underline hover:text-slate-200" rel="noopener">mf.gov.cz</a>). Jedná se o oficiální regulované maximální ceny.
             </dd>
           </div>
           <div>
