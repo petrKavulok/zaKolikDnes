@@ -119,7 +119,6 @@ Vercel Cron for `/api/cron/scrape` is **disabled** (empty `crons` in [vercel.jso
 | Var            | Purpose                                  |
 |----------------|------------------------------------------|
 | `DATABASE_URL` | Neon Postgres connection string           |
-| `SOURCE_URL`   | Index page to discover bulletins          |
 | `ADMIN_TOKEN`  | Header token for `/api/refresh`           |
 | `CRON_SECRET`  | Vercel Cron authentication secret         |
 
