@@ -37,6 +37,23 @@ describe('extractPricesFromText', () => {
     expect(out.effective_date).toBe('2026-03-15');
   });
 
+  it('parses the direct MF page when nav mentions fuel >2 KB before the prices', () => {
+    // Mirrors the Nov 2026 page: title/nav repeat "benzinu a nafty" far above
+    // the prices, and the intro contains small in-text amounts (2,35 Kč/l).
+    const nav = 'Maximální přípustné ceny benzinu a nafty ' + 'Menu položka '.repeat(250);
+    const page =
+      nav +
+      'Maximální přípustné ceny benzinu a nafty Účinnost: 3. listopadu 2026 od 00:00 do 24:00 ' +
+      'na celém území ČR. Snížená spotřební daň z nafty (o 1,939 Kč/l, což včetně DPH ' +
+      'představuje 2,35 Kč/l). Marže maximálně 2,50 Kč/l. ' +
+      'Maximální přípustná cena benzinu: 43,65 Kč s DPH / litr ' +
+      'Maximální přípustná cena nafty: 49,35 Kč s DPH / litr';
+    const out = extractPricesFromText(page);
+    expect(out.gasoline_czk).toBe(43.65);
+    expect(out.diesel_czk).toBe(49.35);
+    expect(out.effective_date).toBe('2026-11-03');
+  });
+
   it('returns undefined fields for malformed input and validation rejects it', () => {
     const out = extractPricesFromText(MALFORMED);
     expect(out.gasoline_czk).toBeUndefined();

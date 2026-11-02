@@ -32,11 +32,17 @@ export function extractPricesFromText(text: string): Partial<ParsedPrices> {
   // Normalise line breaks so regexes can scan freely.
   const flat = text.replace(/\s+/g, ' ');
 
+  // Most specific anchors first. The direct MF page labels prices as
+  // "Maximální přípustná cena benzinu: 43,65 Kč s DPH / litr"; the bare
+  // "benzin"/"nafty" fallbacks also hit the site navigation and title,
+  // which can sit >2 KB before the prices (seen Nov 2026).
   const gasoline =
+    priceNear(flat, /p[řr][íi]pustn[áa]\s+cena\s+benz[íi]nu/i) ??
     priceNear(flat, /natural\s*95/i) ??
     priceNear(flat, /benz[íi]n\s*(?:automobilov[ýy])?(?:\s*95)?/i);
 
   const diesel =
+    priceNear(flat, /p[řr][íi]pustn[áa]\s+cena\s+(?:motorov[ée]\s+)?nafty/i) ??
     priceNear(flat, /motorov[áa]\s*nafta/i) ??
     priceNear(flat, /\bnaft[ay]\b/i) ??
     priceNear(flat, /\bdiesel\b/i);

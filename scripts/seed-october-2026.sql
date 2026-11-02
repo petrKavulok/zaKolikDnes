@@ -80,6 +80,30 @@ VALUES
 
   -- Oct 24–26 Sat/Sun/Mon — CV 109/2026, multi-day bulletin published Oct 23
   ('direct/2026-10-24', '2026-10-24', 44.55, 48.69,
-   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-109-2026-65542')
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-109-2026-65542'),
+
+  -- Backfill for Oct 27 – Nov 3: the cron ran but failed to parse the MF page
+  -- (nav text pushed the fuel keywords >2 KB from the prices). Values taken
+  -- from the Cenový věstník PDFs. CV 111/2026 is an unrelated price decree.
+
+  -- Oct 27 Tue — CV 110/2026
+  ('direct/2026-10-27', '2026-10-27', 44.47, 48.96,
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-110-2026-65549'),
+
+  -- Oct 28–29 Wed/Thu — CV 112/2026, multi-day bulletin (Oct 28 state holiday)
+  ('direct/2026-10-28', '2026-10-28', 44.45, 49.46,
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-112-2026-65574'),
+
+  -- Oct 30 Fri — CV 113/2026
+  ('direct/2026-10-30', '2026-10-30', 44.26, 49.69,
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-113-2026-65582'),
+
+  -- Oct 31 – Nov 2 Sat/Sun/Mon — CV 114/2026, multi-day bulletin published Oct 30
+  ('direct/2026-10-31', '2026-10-31', 43.87, 49.45,
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-114-2026-65594'),
+
+  -- Nov 3 Tue — CV 115/2026, published Nov 2
+  ('direct/2026-11-03', '2026-11-03', 43.65, 49.35,
+   'https://mf.gov.cz/cs/kontrola-a-regulace/cenova-regulace-a-kontrola/cenovy-vestnik/2026/cenovy-vestnik-115-2026-65624')
 
 ON CONFLICT DO NOTHING;
