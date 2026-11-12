@@ -26,9 +26,6 @@ export function PriceChart({ data, allData }: { data: ChartPoint[]; allData?: Ch
     return <div className="text-slate-500">Zatím není dost dat pro graf.</div>;
   }
 
-  // Thin out x-axis labels when there are many data points to avoid overlap.
-  const tickInterval = active.length > 40 ? 'preserveStartEnd' : 0;
-
   return (
     <div>
       {allData && (
@@ -57,7 +54,17 @@ export function PriceChart({ data, allData }: { data: ChartPoint[]; allData?: Ch
         <ResponsiveContainer>
           <LineChart data={active} margin={{ top: 12, right: 16, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-            <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} interval={tickInterval} />
+            <XAxis
+              dataKey="date"
+              stroke="#94a3b8"
+              fontSize={12}
+              // Let recharts drop labels that would overlap; keep first and last.
+              interval="preserveStartEnd"
+              minTickGap={24}
+              // "1.10.2026" -> "1.10." on the axis; the tooltip still shows the full date.
+              tickFormatter={(d: string) => d.replace(/\d{4}$/, '')}
+              tickMargin={6}
+            />
             <YAxis stroke="#94a3b8" fontSize={12} domain={['auto', 'auto']} />
             <Tooltip
               contentStyle={{ background: '#0f172a', border: '1px solid #334155' }}
